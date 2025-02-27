@@ -37,4 +37,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 
-## Made with love by harsha - vardhan 
+## Made with ❤️ by harsha vardhan 
