@@ -69,7 +69,7 @@ export function SiteHeader() {
                       >
                         <div className="text-sm font-medium leading-none">Documentation</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Learn About Api's
+                          Learn About Api&apos;s
                         </p>
                       </Link>
                     </NavigationMenuLink>

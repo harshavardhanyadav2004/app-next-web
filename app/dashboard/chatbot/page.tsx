@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 type MessageType = {
   text: string;
@@ -23,6 +23,9 @@ interface SessionsMap {
 }
 
 const apiKey = process.env.NEXT_PUBLIC_RAG_MODEL_API_KEY;
+if (!apiKey) {
+  throw new Error("API key is not defined");
+}
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 

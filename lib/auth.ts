@@ -1,4 +1,4 @@
-import { onAuthStateChanged } from "firebase/auth"
+import { onAuthStateChanged, User } from "firebase/auth"
 import { auth } from "./firebase"
 
 export const setAuthToken = (token: string) => {
@@ -22,8 +22,8 @@ export const getAuthToken = () => {
   return null
 }
 
-export const checkUserAuth = (callback: (user: any) => void) => {
+export const checkUserAuth = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, (user) => {
-    callback(user);
+   callback(user)
   });
 }

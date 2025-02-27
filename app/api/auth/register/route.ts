@@ -4,7 +4,7 @@ import { generateOTP, sendOTPEmail } from "@/lib/email-service"
 
 export async function POST(req: Request) {
   try {
-    const { email, password, ...userData } = await req.json()
+    const { email, password} = await req.json()
 
     // Create user in Firebase Auth
     const userRecord = await adminAuth.createUser({

@@ -10,7 +10,6 @@ import { Zap, Command, Scale, Bot, Shield, Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation" 
 export default function Home() {
   const triggerConfetti = () => {
-    const count = 3
     const defaults = {
       origin: { y: 0.7 },
       spread: 90,

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/hooks/use-toast"
-import { Camera, Mail, Key, Phone, Check, User, Loader2 } from "lucide-react"
+import { Camera, Mail, Key, Phone, Check,  Loader2 } from "lucide-react"
 import { auth } from "@/lib/firebase"
 import {  updateUserdata, updateUserProfile } from "@/lib/auth-service"
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore"
@@ -63,7 +63,6 @@ export default function ProfilePage() {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
-
     const user = auth.currentUser
     if (!user) {
       toast({
@@ -108,6 +107,7 @@ export default function ProfilePage() {
       const otp = await generateOTP()
       if(!isOtpSent){
       sendOTPEmail(profile.email, otp)
+      setPendingEmail(null)
       setDoc(doc(db,"updateProfile",profile.email),{
         otp,
         expires: Date.now() + 10 * 60 * 1000,
@@ -134,6 +134,7 @@ export default function ProfilePage() {
     try {
       const otp = await generateOTP()
       sendOTPEmail(profile.email, otp)
+      setPendingEmail(null)
       updateDoc(doc(db,"updateProfile",profile.email),{
         otp,
         expires: Date.now() + 10 * 60 * 1000,
@@ -172,6 +173,7 @@ export default function ProfilePage() {
       if (otp === Constotp && expires > Date.now()) {
         setIsEmailVerified(true)
         setIsOtpSent(false)
+        setPendingEmail(null)
         setOtp("")
         toast({ title: "Success!", description: "Email verified successfully." })
       } else {
@@ -378,7 +380,7 @@ export default function ProfilePage() {
                   type="button"
                   variant={isOtpSent ? "outline" : "default"}
                   onClick={handleSendOtp}
-                  disabled={!profile.email || isLoading}
+                  disabled={!profile.email  || pendingEmail!==null|| isLoading}
                 >
                   {isOtpSent ? "Resend" : "Verify"}
                 </Button>

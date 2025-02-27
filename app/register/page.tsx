@@ -349,7 +349,7 @@ export default function Register() {
                 <div className="text-center">
                   <h3 className="text-xl font-semibold mb-2">Enter Verification Code</h3>
                   <p className="text-sm text-muted-foreground">
-                    We've sent a code to {formData.email.replace(/(\w{3})[\w.-]+@([\w.]+)/, "$1***@$2")}
+                    We&apos;ve sent a code to {formData.email.replace(/(\w{3})[\w.-]+@([\w.]+)/, "$1***@$2")}
                   </p>
                 </div>
 
@@ -372,7 +372,7 @@ export default function Register() {
                 </Button>
 
                 <p className="text-center text-sm text-muted-foreground">
-                  Didn't receive the code?{" "}
+                  Didn&apos;t receive the code?{" "}
                   <button
                     type="button"
                     className="text-primary hover:underline"

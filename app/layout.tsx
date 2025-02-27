@@ -1,4 +1,3 @@
-import { Space_Mono } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { Providers } from "./providers"
 import "./globals.css"

@@ -21,6 +21,13 @@ export type UserData = {
   photoURL?: string
   emailVerified: boolean
 }
+interface UserProfile {
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNo: string;
+}
 
 export const signUp = async (email: string, password: string, userData: Partial<UserData>) => {
   try {
@@ -127,13 +134,10 @@ export const updateUserProfile = async (user: User, data: Partial<UserData>, ima
   }
 }
 
-// Reset password
 export const resetPassword = async (email: string) => {
   try {
     const otp = await generateOTP()
     sendOTPEmail(email, otp)
-
-    // Store OTP in a separate collection for password reset
     setDoc(doc(db, "passwordResets", email), {
       otp,
       expires: Date.now() + 10 * 60 * 1000,
@@ -144,7 +148,6 @@ export const resetPassword = async (email: string) => {
   }
 }
 
-// Verify reset password OTP
 export const verifyResetPasswordOTP = async (email: string, otp: string) => {
   try {
     const resetDocRef = doc(db, "passwordResets", email) // Direct reference
@@ -169,14 +172,14 @@ export const sendResetPasswordEmail = async (email: string) => {
   }
 }
 
-export const updateUserdata = async (userId: string, profile: any) => {
+export const updateUserdata = async (userId: string, profile: UserProfile) => {
   try {
     await updateDoc(doc(db, "users", userId), {
       username: profile.username,
       firstName: profile.firstName,
       lastName: profile.lastName,
       phoneNo: profile.phoneNo,
-      email: profile.email, // 
+      email: profile.email, 
     });
     return { success: true };
   } catch (error) {
