@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,6 @@ export default function ChatbotPage() {
   const [sessionId, setSessionId] = useState("");
   const [sessions, setSessions] = useState<SessionsMap>({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,7 +58,7 @@ export default function ChatbotPage() {
     } else {
       startNewSession();
     }
-  }, [startNewSession]);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -75,18 +74,19 @@ export default function ChatbotPage() {
   useEffect(() => {
     if (sessionId && sessions[sessionId]) {
       localStorage.setItem("chatSessions", JSON.stringify(sessions));
+      localStorage.setItem("currentSessionId", sessionId);
     }
-  }, [sessions]);
+  }, [sessions, sessionId]);
 
-  function generateSessionId(): string {
+  const generateSessionId = () => {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
-  }
+  };
 
-  function cleanTextOutput(text: string): string {
+  const cleanTextOutput = (text: string) => {
     return text.replace(/```[a-z]*\n|```/g, "").replace(/\n{3,}/g, "\n\n").replace(/\*\*/g, "").trim();
-  }
+  };
 
-  async function sendMessage() {
+  const sendMessage = async () => {
     if (!input.trim()) return;
     setIsLoading(true);
 
@@ -100,7 +100,7 @@ export default function ChatbotPage() {
         parts: [{ text: msg.text }]
       }));
 
-      const chatSession = model.startChat({
+      const chatSession = await model.startChat({
         generationConfig: {
           temperature: 1,
           topP: 0.95,
@@ -128,7 +128,6 @@ export default function ChatbotPage() {
             messages: newMessages,
           },
         };
-        localStorage.setItem("chatSessions", JSON.stringify(updatedSessions));
         return updatedSessions;
       });
     } catch (error) {
@@ -138,9 +137,9 @@ export default function ChatbotPage() {
 
     setInput("");
     setIsLoading(false);
-  }
+  };
 
-  function startNewSession() {
+  const startNewSession = useCallback(() => {
     const newSessionId = generateSessionId();
     const newSession: Session = {
       id: newSessionId,
@@ -148,26 +147,20 @@ export default function ChatbotPage() {
       messages: []
     };
 
-    const updatedSessions: SessionsMap = {
-      ...sessions,
+    setSessions(prevSessions => ({
+      ...prevSessions,
       [newSessionId]: newSession
-    };
-
-    setSessions(updatedSessions);
+    }));
     setSessionId(newSessionId);
     setMessages([]);
+  }, [sessions]);
 
-    localStorage.setItem("chatSessions", JSON.stringify(updatedSessions));
-    localStorage.setItem("currentSessionId", newSessionId);
-  }
-
-  function switchSession(id: string) {
+  const switchSession = (id: string) => {
     if (sessions[id]) {
       setSessionId(id);
       setMessages(sessions[id].messages || []);
-      localStorage.setItem("currentSessionId", id);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -181,18 +174,18 @@ export default function ChatbotPage() {
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-black text-white border border-gray-200 rounded-md shadow-lg z-50">
                 {Object.values(sessions).map(session => (
-                 <button
-                 key={session.id}
-                 className={`block px-4 py-2 text-sm w-full text-left ${
-                   session.id === sessionId ? "bg-black text-white" : "hover:bg-black-100"
-                 }`}
-                 onClick={() => {
-                   switchSession(session.id);
-                   setDropdownOpen(false);
-                 }}
-               >
-                 {session.name}
-               </button>
+                  <button
+                    key={session.id}
+                    className={`block px-4 py-2 text-sm w-full text-left ${
+                      session.id === sessionId ? "bg-black text-white" : "hover:bg-black-100"
+                    }`}
+                    onClick={() => {
+                      switchSession(session.id);
+                      setDropdownOpen(false);
+                    }}
+                  >
+                    {session.name}
+                  </button>
                 ))}
               </div>
             )}
@@ -202,54 +195,24 @@ export default function ChatbotPage() {
       </div>
 
       <Card className="flex-1">
-  <CardContent className="p-4">
-    <div className="flex flex-col h-[600px]">
-      {/* Message List */}
-      <div className="flex-1 overflow-auto py-4 space-y-4 px-2">
-        {messages.length === 0 ? (
-          <div className="text-center text-gray-500 mt-8">
-            Start a conversation by typing a message below.
-          </div>
-        ) : (
-          messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`flex w-full ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`p-3 rounded-lg max-w-fit break-words inline-block ${
-                  msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
-                }`}
-              >
-                {msg.text}
-              </div>
+        <CardContent className="p-4">
+          <div className="flex flex-col h-[600px]">
+            <div className="flex-1 overflow-auto py-4 space-y-4 px-2">
+              {messages.map((msg, index) => (
+                <div key={index} className={`flex w-full ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`p-3 rounded-lg max-w-fit break-words inline-block ${msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-200 text-black"}`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))
-        )}
-      </div>
-
-      <div className="border-t pt-4 px-2">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Type your message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !isLoading && input.trim()) {
-                sendMessage();
-              }
-            }}
-            disabled={isLoading}
-          />
-          <Button onClick={sendMessage} disabled={isLoading || !input.trim()}>
-            Send
-          </Button>
-        </div>
-      </div>
-    </div>
-  </CardContent>
-</Card>
+            <div className="border-t pt-4 px-2 flex gap-2">
+              <Input value={input} onChange={(e) => setInput(e.target.value)} />
+              <Button onClick={sendMessage} disabled={isLoading || !input.trim()}>Send</Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
