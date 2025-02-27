@@ -1,3 +1,19 @@
+RESOURCES FOR PROJECT 
+
+SMTP - SIMPLE MAIL TRANSFER PROTOCOL 
+
+-- USED APP PASSWORD FOR GENERATING EMAILS AND SENDING OTPS
+
+BACKEND CONFIGURATION
+
+--  USED FIREBASE FOR BACKEND AUTHENTICATION
+
+LOCAL STORAGE 
+
+-- USED LOCAL STORAGE FOR SESSIONS OF CHATBOT 
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
