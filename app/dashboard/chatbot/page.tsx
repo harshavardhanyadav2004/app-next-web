@@ -59,7 +59,7 @@ export default function ChatbotPage() {
     } else {
       startNewSession();
     }
-  }, []);
+  }, [startNewSession]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

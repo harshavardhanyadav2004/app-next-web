@@ -3,7 +3,7 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation" 
-import { getAuth, onAuthStateChanged, User } from "firebase/auth"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { DashboardHeader } from "../components/dashboard/header"
 import { DashboardSidebar } from "../components/dashboard/sidebar"
 

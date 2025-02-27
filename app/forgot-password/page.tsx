@@ -205,7 +205,7 @@ export default function ForgotPassword() {
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "An error occurred.",
+        description: error instanceof Error ? error.message : "An error .",
         variant: "destructive",
       })
     } finally {
