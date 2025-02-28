@@ -8,7 +8,7 @@ import  localFont from "next/font/local"
 const Scene3D = dynamic(() => import("./components/Scene3D"), { ssr: true })
 
 const geistSans = localFont({
-  src: "./fonts/SpaceMono-Regular.ttf",
+  src: "./fonts/Lato-Regular.ttf",
   display: "swap",
 })
 
