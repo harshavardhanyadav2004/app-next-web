@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import { Loader2, Send, Plus, Edit2, Check, X, MessageSquare, Clock, RefreshCw } from "lucide-react"
+import { Loader2, Send, Plus, Edit2, Check, X, MessageSquare, Clock, RefreshCw, Copy, CheckIcon } from "lucide-react"
 import { format, isValid } from "date-fns"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism"
@@ -17,24 +17,43 @@ type MessageType = {
   sender: "user" | "bot"
   timestamp: number
 }
-
 interface Session {
   id: string
   name: string
   messages: MessageType[]
 }
-
 interface SessionsMap {
   [key: string]: Session
 }
-
 const apiKey = process.env.NEXT_PUBLIC_RAG_MODEL_API_KEY
 if (!apiKey) {
   throw new Error("API key is not defined")
 }
 const genAI = new GoogleGenerativeAI(apiKey)
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
-
+const CopyButton = ({ textToCopy }: { textToCopy: string }) => {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(textToCopy)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
+    }
+  }
+  return (
+    <Button
+      variant="secondary"
+      size="icon"
+      className="h-7 w-7 bg-primary/10 hover:bg-primary/20 backdrop-blur-sm"
+      onClick={handleCopy}
+      title="Copy to clipboard"
+    >
+      {copied ? <CheckIcon className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+    </Button>
+  )
+}
 export default function ChatbotPage() {
   const [messages, setMessages] = useState<MessageType[]>([])
   const [input, setInput] = useState("")
@@ -45,20 +64,16 @@ export default function ChatbotPage() {
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
   const [editSessionName, setEditSessionName] = useState("")
   const [error, setError] = useState<string | null>(null)
-
   const dropdownRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [])
 
   useEffect(() => {
     const savedSessions = localStorage.getItem("chatSessions")
     const currentSessionId = localStorage.getItem("currentSessionId")
-
     let parsedSessions: SessionsMap = {}
     if (savedSessions) {
       try {
@@ -68,7 +83,6 @@ export default function ChatbotPage() {
         console.error("Error parsing saved sessions:", e)
       }
     }
-
     if (currentSessionId && parsedSessions[currentSessionId]) {
       setSessionId(currentSessionId)
       setMessages(parsedSessions[currentSessionId].messages || [])
@@ -76,7 +90,6 @@ export default function ChatbotPage() {
       startNewSession()
     }
   }, [])
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -84,18 +97,15 @@ export default function ChatbotPage() {
         setEditingSessionId(null)
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
-
   useEffect(() => {
     if (sessionId && sessions[sessionId]) {
       localStorage.setItem("chatSessions", JSON.stringify(sessions))
       localStorage.setItem("currentSessionId", sessionId)
     }
   }, [sessions, sessionId])
-
   const generateSessionId = () => {
     return Date.now().toString(36) + Math.random().toString(36).substring(2)
   }
@@ -106,10 +116,7 @@ export default function ChatbotPage() {
       .replace(/\*\*/g, "")
       .trim()
   }
-
-  // Function to detect and format code blocks
   const formatMessageText = (text: string) => {
-    // Check if the text contains code blocks with ```
     if (text.includes("```")) {
       const parts = text.split(/(```(?:[\w-]+)?\n[\s\S]*?\n```)/g)
 
@@ -117,40 +124,65 @@ export default function ChatbotPage() {
         <>
           {parts.map((part, i) => {
             if (part.startsWith("```") && part.endsWith("```")) {
-              // Extract language and code
               const match = part.match(/```([\w-]+)?\n([\s\S]*?)\n```/)
               if (match) {
                 const language = match[1] || "javascript"
                 const code = match[2]
-
                 return (
-                  <div key={i} className="my-2 rounded overflow-hidden">
-                    <SyntaxHighlighter language={language} style={atomDark} customStyle={{ margin: 0 }}>
-                      {code}
-                    </SyntaxHighlighter>
+                  <div key={i} className="my-2 rounded overflow-hidden relative w-full">
+                    <div className="absolute top-2 right-2 z-10">
+                      <CopyButton textToCopy={code} />
+                    </div>
+                    <div className="w-full overflow-x-auto">
+                      <SyntaxHighlighter
+                        language={language}
+                        style={atomDark}
+                        customStyle={{ margin: 0 }}
+                        wrapLines={true}
+                        wrapLongLines={true}
+                      >
+                        {code}
+                      </SyntaxHighlighter>
+                    </div>
                   </div>
                 )
               }
             }
-
-            // Handle regular text with line breaks
             return part.split("\n").map((line, j) => <div key={`${i}-${j}`}>{line || <br />}</div>)
           })}
         </>
       )
     }
-
-    // Handle regular text with line breaks
     return text.split("\n").map((line, i) => <div key={i}>{line || <br />}</div>)
   }
-
+  const isCodeInput = (text: string) => {
+    const codePatterns = [
+      /^(const|let|var|function|class|import|export|if|for|while)\s/m,
+      /^(def|class|import|from|if|for|while)\s/m,
+      /^(public|private|protected|class|interface|enum|import)\s/m,
+      /[{};]\s*$/m,
+      /^\s{2,}\w+/m,
+    ]
+    const lines = text.split("\n")
+    return lines.length > 1 && codePatterns.some((pattern) => pattern.test(text))
+  }
   const sendMessage = async () => {
     if (!input.trim()) return
     setIsLoading(true)
     setError(null)
+    let formattedInput = input
+    if (isCodeInput(input)) {
+      const language =
+        input.includes("function") || input.includes("const") || input.includes("let")
+          ? "javascript"
+          : input.includes("def ") || (input.includes("class ") && input.includes(":"))
+            ? "python"
+            : "code"
+      formattedInput = "```" + language + "\n" + input + "\n```"
+    }
 
     const userMessage: MessageType = {
-      text: input,
+      text: formattedInput,
       sender: "user",
       timestamp: Date.now(),
     }
@@ -159,11 +191,17 @@ export default function ChatbotPage() {
     setInput("")
 
     try {
-      const history = updatedMessages.map((msg) => ({
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.text }],
-      }))
-
+      const filteredHistory = updatedMessages
+        .filter((msg) => msg.sender === "user") // Keep only user messages for the beginning
+        .map((msg) => ({
+          role: "user",
+          parts: [{ text: msg.text }],
+        }));
+      if (filteredHistory.length === 0) {
+        setError("The chat must start with a user message.");
+        setIsLoading(false);
+        return;
+      }
       const chatSession = await model.startChat({
         generationConfig: {
           temperature: 1,
@@ -172,13 +210,12 @@ export default function ChatbotPage() {
           maxOutputTokens: 8192,
           responseMimeType: "text/plain",
         },
-        history: history.slice(-10),
+        history: filteredHistory.slice(-10),
       })
 
       const result = await chatSession.sendMessage(input)
       const botResponse = await result.response.text()
       const cleanedResponse = cleanTextOutput(botResponse)
-
       const botMessage: MessageType = {
         text: cleanedResponse,
         sender: "bot",
@@ -201,30 +238,21 @@ export default function ChatbotPage() {
     } catch (error) {
       console.error("Error:", error)
       setError("Failed to get response from AI. Please try again.")
-      // Remove the user message if there was an error
       setMessages(messages)
     } finally {
       setIsLoading(false)
-      // Focus the input field after sending
       setTimeout(() => inputRef.current?.focus(), 100)
     }
   }
-
   const retryLastMessage = async () => {
-    // Find the last user message
     const lastUserMessageIndex = [...messages].reverse().findIndex((msg) => msg.sender === "user")
     if (lastUserMessageIndex === -1) return
-
     const lastUserMessage = messages[messages.length - 1 - lastUserMessageIndex]
     setInput(lastUserMessage.text)
-    // Remove messages after the last user message
     setMessages(messages.slice(0, messages.length - lastUserMessageIndex))
     setError(null)
-
-    // Focus the input field
     setTimeout(() => inputRef.current?.focus(), 100)
   }
-
   const startNewSession = useCallback(() => {
     const newSessionId = generateSessionId()
     const newSession: Session = {
@@ -232,7 +260,6 @@ export default function ChatbotPage() {
       name: `Session ${Object.keys(sessions).length + 1}`,
       messages: [],
     }
-
     setSessions((prevSessions) => ({
       ...prevSessions,
       [newSessionId]: newSession,
@@ -240,10 +267,8 @@ export default function ChatbotPage() {
     setSessionId(newSessionId)
     setMessages([])
     setError(null)
-
-    // Focus the input field
     setTimeout(() => inputRef.current?.focus(), 100)
-  }, [sessions])
+  }, [sessions, generateSessionId])
 
   const switchSession = (id: string) => {
     if (sessions[id]) {
@@ -253,14 +278,11 @@ export default function ChatbotPage() {
       setDropdownOpen(false)
     }
   }
-
   const startEditingSession = (id: string, name: string) => {
     setEditingSessionId(id)
     setEditSessionName(name)
-    // Prevent event propagation
     event?.stopPropagation()
   }
-
   const saveSessionName = (id: string) => {
     if (editSessionName.trim()) {
       setSessions((prev) => ({
@@ -272,16 +294,12 @@ export default function ChatbotPage() {
       }))
     }
     setEditingSessionId(null)
-    // Prevent event propagation
     event?.stopPropagation()
   }
-
   const cancelEditingSession = () => {
     setEditingSessionId(null)
-    // Prevent event propagation
     event?.stopPropagation()
   }
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
@@ -290,7 +308,6 @@ export default function ChatbotPage() {
       }
     }
   }
-
   const deleteSession = (id: string) => {
     if (confirm("Are you sure you want to delete this session?")) {
       setSessions((prev) => {
@@ -298,21 +315,14 @@ export default function ChatbotPage() {
         delete newSessions[id]
         return newSessions
       })
-
       if (id === sessionId) {
-        // If we're deleting the current session, switch to another one or create a new one
         const remainingSessions = Object.keys(sessions).filter((key) => key !== id)
         if (remainingSessions.length > 0) {
           switchSession(remainingSessions[0])
-        } else {
-          startNewSession()
-        }
+        } else { startNewSession() }
       }
-    }
-    // Prevent event propagation
-    event?.stopPropagation()
+    } event?.stopPropagation()
   }
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
@@ -334,9 +344,8 @@ export default function ChatbotPage() {
                     Object.values(sessions).map((session) => (
                       <div
                         key={session.id}
-                        className={`flex items-center justify-between px-4 py-2 hover:bg-muted ${
-                          session.id === sessionId ? "bg-muted/50" : ""
-                        }`}
+                        className={`flex items-center justify-between px-4 py-2 hover:bg-muted ${session.id === sessionId ? "bg-muted/50" : ""
+                          }`}
                       >
                         {editingSessionId === session.id ? (
                           <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
@@ -414,7 +423,6 @@ export default function ChatbotPage() {
           </Button>
         </div>
       </div>
-
       <Card className="flex-1">
         <CardContent className="p-4">
           <div className="flex flex-col h-[600px]">
@@ -432,17 +440,16 @@ export default function ChatbotPage() {
                 <div key={index} className={`flex w-full ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                   <div className="flex flex-col max-w-[80%]">
                     <div
-                      className={`p-3 rounded-lg break-words ${
-                        msg.sender === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                      }`}
+                      className={`p-3 rounded-lg break-words w-full overflow-hidden ${msg.sender === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                        }`}
                     >
                       {formatMessageText(msg.text)}
                     </div>
                     <div className="flex items-center text-xs text-muted-foreground mt-1 gap-1">
-                    <Clock className="h-3 w-3" />
-  {msg.timestamp && isValid(new Date(msg.timestamp))
-    ? format(new Date(msg.timestamp), "h:mm a")
-    : "Invalid Date"}
+                      <Clock className="h-3 w-3" />
+                      {msg.timestamp && isValid(new Date(msg.timestamp))
+                        ? format(new Date(msg.timestamp), "h:mm a")
+                        : "Invalid Date"}
                     </div>
                   </div>
                 </div>
@@ -473,7 +480,6 @@ export default function ChatbotPage() {
 
               <div ref={messagesEndRef} />
             </div>
-
             <div className="border-t pt-4 px-2">
               <form
                 onSubmit={(e) => {
@@ -489,12 +495,6 @@ export default function ChatbotPage() {
                   onKeyDown={handleKeyDown}
                   placeholder="Type your message..."
                   disabled={isLoading}
-                  className="flex-grow"
-                />
-                <Button type="submit" disabled={isLoading || !input.trim()} className="flex items-center gap-2">
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  Send
-                </Button>
-              </form>
-            </div>
-          </div></CardContent></Card> </div> )}
+                  className="flex-grow" />
+                <Button type="submit" disabled={isLoading || !input.trim()} className="flex items-center gap-2">{isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Send{" "} </Button>{" "} </form>{" "}   </div>{" "}</div> </CardContent>  </Card>{" "}   </div>)
+}

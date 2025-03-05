@@ -7,7 +7,8 @@ import { Separator } from "@/components/ui/separator"
 import { motion } from "framer-motion"
 import { Footer } from "./components/footer"
 import { Zap, Command, Scale, Bot, Shield, Sparkles } from "lucide-react"
-import { useRouter } from "next/navigation" 
+import { useRouter } from "next/navigation"
+import AboutPage from "./drag-component/page"
 export default function Home() {
   const triggerConfetti = () => {
     const defaults = {
@@ -51,7 +52,7 @@ export default function Home() {
       startVelocity: 45,
     })
   }
- const router = useRouter();
+  const router = useRouter();
   return (
     <div className="relative flex min-h-screen flex-col">
       <SiteHeader />
@@ -101,12 +102,12 @@ export default function Home() {
               className="flex gap-4"
             >
               <Button size="lg" className="h-12 px-8"
-              onClick={() => router.push("/register")}
+                onClick={() => router.push("/register")}
               >
                 Start Building
               </Button>
               <Button size="lg" variant="outline" className="h-12 px-8"
-              onClick={() => router.push("https://github.com/APPCRAFT-NO-CODE-MOBILE-APP")}
+                onClick={() => router.push("https://github.com/APPCRAFT-NO-CODE-MOBILE-APP")}
               >
                 View Demo
               </Button>
@@ -129,7 +130,7 @@ export default function Home() {
               AppCraft provides all the tools you need to create powerful Mobile Apps that can scale to millions of users.
             </p>
           </motion.div>
-          <div className="mx-auto grid gap-8 sm:max-w-3xl sm:grid-cols-2 lg:max-w-5xl lg:grid-cols-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
@@ -142,23 +143,29 @@ export default function Home() {
                   rotateY: index % 3 === 0 ? 5 : -5,
                   transition: { duration: 0.3 },
                 }}
-                className="relative overflow-hidden rounded-lg border bg-background p-2"
+                className="flex flex-col items-center space-y-4 rounded-lg border border-gray-800 bg-background p-6 h-full"
               >
-                <div className="flex h-[180px] flex-col justify-between rounded-md p-6">
-                  <feature.icon className="h-12 w-12 text-primary" />
-                  <div className="space-y-2">
-                    <h3 className="font-bold">{feature.name}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
-                  </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10 text-blue-500">
+                  <feature.icon className="h-6 w-6" />
                 </div>
+                <h3 className="text-xl font-bold">{feature.name}</h3>
+                <p className="text-center text-gray-400 flex-grow">{feature.description}</p>
               </motion.div>
             ))}
           </div>
+
         </section>
 
 
         <Separator className="my-12" />
 
+        <section className="w-full py-12 md:py-24 lg:py-32 text-white">
+          <div className="container px-4 md:px-6">
+            <AboutPage />
+          </div>
+        </section>
+
+        <Separator className="my-12" />
         <section className="container py-12 md:py-24 lg:py-32">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -171,9 +178,9 @@ export default function Home() {
             <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
               Create your first App in minutes !!
             </p>
-            <Button size="lg" className="mt-4" 
-             onClick={() => router.push("/register")}
-            
+            <Button size="lg" className="mt-4"
+              onClick={() => router.push("/register")}
+
             >
               Start Building Now
             </Button>
