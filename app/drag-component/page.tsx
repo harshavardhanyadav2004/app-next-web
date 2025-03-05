@@ -1,3 +1,4 @@
+"use client"
 import React, { ChangeEvent, DragEvent, JSX, MouseEvent, ReactNode, useRef, useState } from "react"
 import { ArrowRight, Code, Database, Layout, Layers, Smartphone, Users, Zap } from "lucide-react"
 import { motion, useInView } from "framer-motion"
@@ -6,8 +7,7 @@ interface Position { x: number ; y: number }
 interface Size { width: number;height: number}
 interface PhoneElement {id: number; type: "text" | "input" | "button" | "image"
   label: string;content?: string;placeholder?: string;position: Position;size: Size;
-  style?: { 
-    fontSize?: string
+  style?: { fontSize?: string
     fontWeight?: string
     textAlign?: "left" | "right" | "center" | "justify" | "start" | "end"
   }
