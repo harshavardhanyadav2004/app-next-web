@@ -192,10 +192,10 @@ function DragDropDemo() {
       )
     }
     const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove as any)
+      document.removeEventListener("mousemove", handleMouseMove as unknown as EventListener)
       document.removeEventListener("mouseup", handleMouseUp)
     }
-    document.addEventListener("mousemove", handleMouseMove as any)
+    document.addEventListener("mousemove", handleMouseMove as unknown as EventListener)
     document.addEventListener("mouseup", handleMouseUp)
   }
   const handleResizeStart = (e: MouseEvent<HTMLDivElement>, element: PhoneElement, corner: string) => {
@@ -252,10 +252,10 @@ function DragDropDemo() {
     }
     const handleResizeEnd = () => {
       setResizing(false)
-      document.removeEventListener("mousemove", handleResizeMove as any)
+      document.removeEventListener("mousemove", handleResizeMove as unknown as EventListener)
       document.removeEventListener("mouseup", handleResizeEnd)
     }
-    document.addEventListener("mousemove", handleResizeMove as any)
+    document.addEventListener("mousemove", handleResizeMove as unknown as EventListener)
     document.addEventListener("mouseup", handleResizeEnd)
   }
   const handleContentChange = (e: ChangeEvent<HTMLInputElement>, elementId: number) => {
