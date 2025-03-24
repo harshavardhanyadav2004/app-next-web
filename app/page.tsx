@@ -75,7 +75,7 @@ export default function Home() {
                 triggerConfetti(); // Call your function
               }}
             >
-              🎉 <Separator className="mx-2 h-4" orientation="vertical" /> Introducing AppCraft
+              🎉 <Separator className="mx-2 h-4" orientation="vertical" /> Introducing CodeLoomer
             </motion.a>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -127,7 +127,7 @@ export default function Home() {
           >
             <h2 className="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl">Features built for scale</h2>
             <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-              AppCraft provides all the tools you need to create powerful Mobile Apps that can scale to millions of users.
+              CodeLoomer provides all the tools you need to create powerful Mobile Apps that can scale to millions of users.
             </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

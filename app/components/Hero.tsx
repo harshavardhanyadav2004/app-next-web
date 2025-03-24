@@ -17,7 +17,7 @@ export default function Hero() {
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8">
-            AppCraft empowers you to create powerful Mobile Apps easily and quickly, without writing a single line of
+            CodeLoomer empowers you to create powerful Mobile Apps easily and quickly, without writing a single line of
             code.
           </p>
           <a

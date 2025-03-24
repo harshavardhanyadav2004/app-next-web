@@ -12,7 +12,7 @@ import { useState } from "react"
 const sidebarItems = [
   { title: "User Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Chatbot", href: "/dashboard/chatbot", icon: MessageSquare },
-  { title: "AppCraft Dashboard", href: "/dashboard/admin", icon: ShieldCheck },
+  { title: "CodeLoomer Dashboard", href: "/dashboard/admin", icon: ShieldCheck },
 ]
 
 export function DashboardSidebar() {
@@ -55,7 +55,7 @@ export function DashboardSidebar() {
           <div className="flex h-full flex-col">
             <div className="border-b px-6 py-4">
               <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-                AppCraft
+                CodeLoomer
               </Link>
             </div>
             <SidebarContent />
@@ -68,7 +68,7 @@ export function DashboardSidebar() {
         <div className="flex h-full max-h-screen flex-col">
           <div className="border-b px-6 py-4">
             <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-              AppCraft
+              CodeLoomer
             </Link>
           </div>
           <SidebarContent />

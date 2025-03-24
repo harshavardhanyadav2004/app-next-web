@@ -20,7 +20,7 @@ export default function AboutPage() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl">How App Craft Works</h2>
+                <h2 className="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl">How CodeLoomer Works</h2>
                 <p className="max-w-[900px] text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Our intuitive drag-and-drop interface makes app development simple and accessible to everyone.
                 </p>
@@ -465,7 +465,7 @@ function DragDropDemo() {
           )}
         </div>
         <div className="mt-8 text-center">
-          <p className="text-gray-400 mb-4">This interactive demo shows how easy it is to build apps with AppCraft</p>
+          <p className="text-gray-400 mb-4">This interactive demo shows how easy it is to build apps with CodeLoomer</p>
           <Button className="mt-4" size="lg">
             Try the Full Experience
             <ArrowRight className="ml-2 h-4 w-4" /> </Button>  </div> </div> </div> )}

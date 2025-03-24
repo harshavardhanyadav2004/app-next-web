@@ -37,7 +37,7 @@ export function Footer() {
         </div>
         <Separator />
         <div className="text-center">
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} AppCraft. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} CodeLoomer. All rights reserved.</p>
         </div>
       </div>
     </footer>

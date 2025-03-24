@@ -52,7 +52,7 @@ const getInitials = (firstName?: string, lastName?: string) => {
 };
   return (
     <div className="flex justify-between items-center p-4 border-b">
-      <h1 className="text-xl font-bold">AppCraft</h1>
+      <h1 className="text-xl font-bold">CodeLoomer</h1>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost">

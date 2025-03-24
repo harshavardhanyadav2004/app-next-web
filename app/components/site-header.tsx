@@ -32,7 +32,7 @@ export function SiteHeader() {
             transition={{ delay: 0.5 }}
             className="text-2xl font-bold"
           >
-            AppCraft
+            CodeLoomer
           </motion.span>
         </Link>
         <NavigationMenu className="hidden md:flex">
